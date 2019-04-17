@@ -66,20 +66,35 @@ public class MyDispatcherServlet extends HttpServlet {
         //3、真正的调用方法,返回ModelAndView存储了要穿页面上值，和页面模板的名称
         MyModelAndView mv = ha.handle(req,resp,handler);
 
-
+        //这一步才是真正的输出
         processDispatchResult(req, resp, mv);
 
 
     }
 
-    private void processDispatchResult(HttpServletRequest req, HttpServletResponse resp, MyModelAndView mv) {
+    private void processDispatchResult(HttpServletRequest req, HttpServletResponse resp, MyModelAndView mv) throws Exception {
         //把给我的ModleAndView变成一个HTML、OuputStream、json、freemark、veolcity
         //ContextType
         if(null == mv){return;}
 
+        //如果ModelAndView不为null，怎么办？
+        if(this.viewResolvers.isEmpty()){return;}
+
+        for (MyViewResolver viewResolver : this.viewResolvers) {
+            MyView view = viewResolver.resolveViewName(mv.getViewName(),null);
+            view.render(mv.getModel(),req,resp);
+            return;
+        }
+
+
     }
 
     private MyHandlerAdapter getHandlerAdapter(MyHandlerMapping handlerMapping) {
+        if(this.handlerAdapters.isEmpty()){return null;}
+        MyHandlerAdapter ha = this.handlerAdapters.get(handlerMapping);
+        if(ha.supports(handlerMapping)){
+            return ha;
+        }
         return null;
     }
 

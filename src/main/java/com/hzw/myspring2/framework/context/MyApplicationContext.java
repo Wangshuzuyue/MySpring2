@@ -104,7 +104,7 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
         MyBeanDefinition myBeanDefinition = this.beanDefinitionMap.get(beanName);
         Object instance = null;
 
-        //这个逻辑还不严谨，自己可以去参考Spring源码
+        //这个逻辑还不严谨，自己可以去参考Spring源码【对实现了ApplicationContextAware进行 setApplicationContext 回调】
         //工厂模式 + 策略模式
         MyBeanPostProcessor postProcessor = new MyBeanPostProcessor();
 
