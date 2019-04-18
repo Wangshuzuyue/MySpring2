@@ -3,6 +3,11 @@ package com.hzw.myspring2.framework.context;
 import com.hzw.myspring2.framework.annotation.MyAutowired;
 import com.hzw.myspring2.framework.annotation.MyController;
 import com.hzw.myspring2.framework.annotation.MyService;
+import com.hzw.myspring2.framework.aop.MyAopProxy;
+import com.hzw.myspring2.framework.aop.MyCglibAopProxy;
+import com.hzw.myspring2.framework.aop.MyJdkDynamicAopProxy;
+import com.hzw.myspring2.framework.aop.config.MyAopConfig;
+import com.hzw.myspring2.framework.aop.support.MyAdvisedSupport;
 import com.hzw.myspring2.framework.beans.MyBeanWrapper;
 import com.hzw.myspring2.framework.beans.config.MyBeanDefinition;
 import com.hzw.myspring2.framework.beans.config.MyBeanPostProcessor;
@@ -29,7 +34,7 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
     /**
      * 单例的IOC容器缓存
      */
-    private Map<String,Object> singletonObjects = new ConcurrentHashMap<String, Object>();
+    private Map<String,Object> factoryBeanObjectCache = new ConcurrentHashMap<String, Object>();
 
     /**
      * 通用的IOC容器
@@ -115,7 +120,7 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
         //3、把这个对象封装到BeanWrapper中
         MyBeanWrapper beanWrapper = new MyBeanWrapper(instance);
 
-        //singletonObjects
+        //factoryBeanObjectCache
 
         //factoryBeanInstanceCache
 
@@ -188,13 +193,23 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
         try {
 //            myBeanDefinition.getFactoryBeanName()
             //假设默认就是单例,细节暂且不考虑，先把主线拉通
-            if(this.singletonObjects.containsKey(className)){
-                instance = this.singletonObjects.get(className);
+            if(this.factoryBeanObjectCache.containsKey(className)){
+                instance = this.factoryBeanObjectCache.get(className);
             }else {
                 Class<?> clazz = Class.forName(className);
                 instance = clazz.newInstance();
-                this.singletonObjects.put(className,instance);
-                this.singletonObjects.put(myBeanDefinition.getFactoryBeanName(),instance);
+
+                MyAdvisedSupport config = instantionAopConfig(myBeanDefinition);
+                config.setTargetClass(clazz);
+                config.setTarget(instance);
+
+                //符合PointCut的规则的话，将创建代理对象
+                if(config.pointCutMatch()) {
+                    instance = createProxy(config).getProxy();
+                }
+
+                this.factoryBeanObjectCache.put(className,instance);
+                this.factoryBeanObjectCache.put(myBeanDefinition.getFactoryBeanName(),instance);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -213,6 +228,26 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
 
     public Properties getConfig(){
         return this.reader.getConfig();
+    }
+
+    private MyAopProxy createProxy(MyAdvisedSupport config) {
+
+        Class targetClass = config.getTargetClass();
+        if(targetClass.getInterfaces().length > 0){
+            return new MyJdkDynamicAopProxy(config);
+        }
+        return new MyCglibAopProxy(config);
+    }
+    
+    private MyAdvisedSupport instantionAopConfig(MyBeanDefinition gpBeanDefinition) {
+        MyAopConfig config = new MyAopConfig();
+        config.setPointCut(this.reader.getConfig().getProperty("pointCut"));
+        config.setAspectClass(this.reader.getConfig().getProperty("aspectClass"));
+        config.setAspectBefore(this.reader.getConfig().getProperty("aspectBefore"));
+        config.setAspectAfter(this.reader.getConfig().getProperty("aspectAfter"));
+        config.setAspectAfterThrow(this.reader.getConfig().getProperty("aspectAfterThrow"));
+        config.setAspectAfterThrowingName(this.reader.getConfig().getProperty("aspectAfterThrowingName"));
+        return new MyAdvisedSupport(config);
     }
 }
 

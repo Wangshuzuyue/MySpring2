@@ -1,5 +1,7 @@
 package com.hzw.myspring2.demo.controller;
 
+import com.hzw.myspring2.demo.service.TestService;
+import com.hzw.myspring2.framework.annotation.MyAutowired;
 import com.hzw.myspring2.framework.annotation.MyController;
 import com.hzw.myspring2.framework.annotation.MyRequestMapping;
 import com.hzw.myspring2.framework.annotation.MyRequestParam;
@@ -17,9 +19,14 @@ import java.util.Map;
 @MyRequestMapping("/test")
 public class TestController {
 
+
+    @MyAutowired
+    private TestService testService;
+
     @MyRequestMapping("/hello")
     public MyModelAndView hello(@MyRequestParam("name") String name, @MyRequestParam("age") Integer age){
         String str = "name: " + name + "age: " + age;
+        testService.hello(name, age);
         System.out.println(str);
         Map<String, Object> models = new HashMap<>();
         models.put("name", name);
