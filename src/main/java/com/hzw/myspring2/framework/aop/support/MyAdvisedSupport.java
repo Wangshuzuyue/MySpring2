@@ -2,6 +2,7 @@ package com.hzw.myspring2.framework.aop.support;
 
 import com.hzw.myspring2.framework.aop.aspect.MyAfterReturningAdviceInterceptor;
 import com.hzw.myspring2.framework.aop.aspect.MyAfterThrowingAdviceInterceptor;
+import com.hzw.myspring2.framework.aop.aspect.MyMethodAroundAdviceInterceptor;
 import com.hzw.myspring2.framework.aop.aspect.MyMethodBeforeAdviceInterceptor;
 import com.hzw.myspring2.framework.aop.config.MyAopConfig;
 
@@ -115,9 +116,19 @@ public class MyAdvisedSupport {
                     if(!(null == config.getAspectAfterThrow() || "".equals(config.getAspectAfterThrow()))) {
                         //创建一个Advivce
                         MyAfterThrowingAdviceInterceptor throwingAdvice =
-                        new MyAfterThrowingAdviceInterceptor(
-                                aspectMethods.get(config.getAspectAfterThrow()),
-                                aspectClass.newInstance());
+                                new MyAfterThrowingAdviceInterceptor(
+                                        aspectMethods.get(config.getAspectAfterThrow()),
+                                        aspectClass.newInstance());
+                        throwingAdvice.setThrowName(config.getAspectAfterThrowingName());
+                        advices.add(throwingAdvice);
+                    }
+
+                    if(!(null == config.getAspectAround() || "".equals(config.getAspectAround()))) {
+                        //创建一个环绕Advivce
+                        MyMethodAroundAdviceInterceptor throwingAdvice =
+                                new MyMethodAroundAdviceInterceptor(
+                                        aspectMethods.get(config.getAspectAround()),
+                                        aspectClass.newInstance());
                         throwingAdvice.setThrowName(config.getAspectAfterThrowingName());
                         advices.add(throwingAdvice);
                     }

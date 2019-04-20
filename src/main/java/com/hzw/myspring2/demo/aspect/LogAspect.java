@@ -17,14 +17,14 @@ public class LogAspect {
     public void before(MyJoinPoint joinPoint){
         joinPoint.setUserAttribute("startTime_" + joinPoint.getMethod().getName(),System.currentTimeMillis());
         //这个方法中的逻辑，是由我们自己写的
-        log.info("Invoker Before Method!!!" +
+        log.info(">>>>>>>>Invoker Before Method!!!" +
                 "\nTargetObject:" +  joinPoint.getThis() +
                 "\nArgs:" + Arrays.toString(joinPoint.getArguments()));
     }
 
     //在调用一个方法之后，执行after方法
     public void after(MyJoinPoint joinPoint){
-        log.info("Invoker After Method!!!" +
+        log.info(">>>>>>>>Invoker After Method!!!" +
                 "\nTargetObject:" +  joinPoint.getThis() +
                 "\nArgs:" + Arrays.toString(joinPoint.getArguments()));
         long startTime = (Long) joinPoint.getUserAttribute("startTime_" + joinPoint.getMethod().getName());
@@ -33,10 +33,15 @@ public class LogAspect {
     }
 
     public void afterThrowing(MyJoinPoint joinPoint, Throwable ex){
-        log.info("出现异常" +
+        log.info(">>>>>>>>出现异常" +
                 "\nTargetObject:" +  joinPoint.getThis() +
                 "\nArgs:" + Arrays.toString(joinPoint.getArguments()) +
                 "\nThrows:" + ex.getMessage());
     }
 
+    public void around(MyJoinPoint joinPoint, Throwable ex){
+        log.info(">>>>><<<<<<Around" +
+                "\nTargetObject:" +  joinPoint.getThis() +
+                "\nArgs:" + Arrays.toString(joinPoint.getArguments()));
+    }
 }
