@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * @Auther: huangzuwang
  * @Date: 2019/4/17 17:35
- * @Description:
+ * @Description: 相当于解析AOP配置的工具类
  */
 public class MyAdvisedSupport {
 
@@ -27,6 +27,9 @@ public class MyAdvisedSupport {
 
     private MyAopConfig config;
 
+    /**
+     * 类名匹配的正则
+     */
     private Pattern pointCutClassPattern;
 
     private transient Map<Method, List<Object>> methodCache;
@@ -53,7 +56,6 @@ public class MyAdvisedSupport {
             //底层逻辑，对代理方法进行一个兼容处理
             this.methodCache.put(m,cached);
         }
-
         return cached;
     }
 
@@ -86,11 +88,13 @@ public class MyAdvisedSupport {
 
 
             Class aspectClass = Class.forName(this.config.getAspectClass());
+            //获取切面类的所有方法
             Map<String,Method> aspectMethods = new HashMap<String,Method>();
             for (Method m : aspectClass.getMethods()) {
                 aspectMethods.put(m.getName(),m);
             }
 
+            //遍历目标类的所有方法
             for (Method m : this.targetClass.getMethods()) {
                 String methodString = m.toString();
                 if (methodString.contains("throws")) {
@@ -98,11 +102,13 @@ public class MyAdvisedSupport {
                 }
 
                 Matcher matcher = pattern.matcher(methodString);
+                // 如果目标类的方法名匹配上了
                 if(matcher.matches()){
                     //执行器链
                     List<Object> advices = new LinkedList<Object>();
                     //把每一个方法包装成 MethodIterceptor
                     //before
+                    // 前置通知配置不为空
                     if(!(null == config.getAspectBefore() || "".equals(config.getAspectBefore()))) {
                         //创建一个Advivce
                         advices.add(new MyMethodBeforeAdviceInterceptor(aspectMethods.get(config.getAspectBefore()),aspectClass.newInstance()));
@@ -119,7 +125,7 @@ public class MyAdvisedSupport {
                                 new MyAfterThrowingAdviceInterceptor(
                                         aspectMethods.get(config.getAspectAfterThrow()),
                                         aspectClass.newInstance());
-                        throwingAdvice.setThrowName(config.getAspectAfterThrowingName());
+                        throwingAdvice.setThrowingName(config.getAspectAfterThrowingName());
                         advices.add(throwingAdvice);
                     }
 
@@ -129,7 +135,7 @@ public class MyAdvisedSupport {
                                 new MyMethodAroundAdviceInterceptor(
                                         aspectMethods.get(config.getAspectAround()),
                                         aspectClass.newInstance());
-                        throwingAdvice.setThrowName(config.getAspectAfterThrowingName());
+                        throwingAdvice.setThrowingName(config.getAspectAfterThrowingName());
                         advices.add(throwingAdvice);
                     }
                     methodCache.put(m,advices);

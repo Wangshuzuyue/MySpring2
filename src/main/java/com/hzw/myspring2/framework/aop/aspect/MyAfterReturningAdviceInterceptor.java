@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
  * @Date: 2019/4/17 16:46
  * @Description:
  */
-public class MyAfterReturningAdviceInterceptor extends MyAbstractAspectAdvice implements MyAdvice,MyMethodInterceptor {
+public class MyAfterReturningAdviceInterceptor extends AbstractMyAspectAdvice implements MyMethodInterceptor {
 
     private MyJoinPoint joinPoint;
 

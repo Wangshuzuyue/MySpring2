@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MyApplicationContext extends MyDefaultListableBeanFactory implements MyBeanFactory {
 
-    private String [] configLoactions;
+    private String [] configLocations;
     private MyBeanDefinitionReader reader;
 
     /**
@@ -41,8 +41,8 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
      */
     private Map<String,MyBeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<String, MyBeanWrapper>();
 
-    public MyApplicationContext(String... configLoactions){
-        this.configLoactions = configLoactions;
+    public MyApplicationContext(String... configLocations){
+        this.configLocations = configLocations;
         try {
             refresh();
         } catch (Exception e) {
@@ -54,7 +54,7 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
     @Override
     public void refresh() throws Exception{
         //1、定位，定位配置文件
-        reader = new MyBeanDefinitionReader(this.configLoactions);
+        reader = new MyBeanDefinitionReader(this.configLocations);
 
         //2、加载配置文件，扫描相关的类，把它们封装成BeanDefinition
         List<MyBeanDefinition> beanDefinitions = reader.loadBeanDefinitions();
@@ -203,7 +203,7 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
                 config.setTargetClass(clazz);
                 config.setTarget(instance);
 
-                //符合PointCut的规则的话，将创建代理对象
+                //符合PointCut的规则的话，将创建代理对象，覆盖原生对象
                 if(config.pointCutMatch()) {
                     instance = createProxy(config).getProxy();
                 }
@@ -233,6 +233,7 @@ public class MyApplicationContext extends MyDefaultListableBeanFactory implement
     private MyAopProxy createProxy(MyAdvisedSupport config) {
 
         Class targetClass = config.getTargetClass();
+        //根据目标类是否实现了接口，使用不同的代理方式
         if(targetClass.getInterfaces().length > 0){
             return new MyJdkDynamicAopProxy(config);
         }

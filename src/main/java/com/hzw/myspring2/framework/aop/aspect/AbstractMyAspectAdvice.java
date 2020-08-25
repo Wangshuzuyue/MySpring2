@@ -1,16 +1,30 @@
 package com.hzw.myspring2.framework.aop.aspect;
 
+import lombok.Data;
+
 import java.lang.reflect.Method;
 
 /**
- * @Auther: huangzuwang
- * @Date: 2019/4/17 16:45
- * @Description:
- */
-public abstract class MyAbstractAspectAdvice implements MyAdvice {
+ * @description:
+ * @author: huangzuwang
+ * @date: 2020-04-12 17:32
+ **/
+@Data
+public abstract class AbstractMyAspectAdvice {
+
+    /**
+     * 切面里定义的方法
+     */
     private Method aspectMethod;
+
+    /**
+     * 切面对象
+     */
     private Object aspectTarget;
-    public MyAbstractAspectAdvice(Method aspectMethod, Object aspectTarget) {
+
+    private String throwingName;
+
+    public AbstractMyAspectAdvice(Method aspectMethod, Object aspectTarget) {
        this.aspectMethod = aspectMethod;
        this.aspectTarget = aspectTarget;
     }
@@ -33,6 +47,4 @@ public abstract class MyAbstractAspectAdvice implements MyAdvice {
             return this.aspectMethod.invoke(aspectTarget,args);
         }
     }
-
-
 }

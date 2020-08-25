@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  * @Date: 2019/4/17 16:44
  * @Description:
  */
-public class MyMethodBeforeAdviceInterceptor extends MyAbstractAspectAdvice implements MyAdvice,MyMethodInterceptor {
+public class MyMethodBeforeAdviceInterceptor extends AbstractMyAspectAdvice implements MyMethodInterceptor {
 
 
     private MyJoinPoint joinPoint;

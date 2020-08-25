@@ -9,12 +9,10 @@ import java.lang.reflect.Method;
  * @Date: 2019/4/20 16:44
  * @Description:
  */
-public class MyMethodAroundAdviceInterceptor extends MyAbstractAspectAdvice implements MyAdvice,MyMethodInterceptor {
+public class MyMethodAroundAdviceInterceptor extends AbstractMyAspectAdvice implements MyMethodInterceptor {
 
 
     private MyJoinPoint joinPoint;
-
-    private String throwingName;
 
     public MyMethodAroundAdviceInterceptor(Method aspectMethod, Object aspectTarget) {
         super(aspectMethod, aspectTarget);
@@ -48,9 +46,5 @@ public class MyMethodAroundAdviceInterceptor extends MyAbstractAspectAdvice impl
             throw e;
         }
         return proceed;
-    }
-
-    public void setThrowName(String throwName){
-        this.throwingName = throwName;
     }
 }

@@ -10,10 +10,8 @@ import java.lang.reflect.Method;
  * @Date: 2019/4/17 16:48
  * @Description:
  */
-public class MyAfterThrowingAdviceInterceptor extends MyAbstractAspectAdvice implements MyAdvice,MyMethodInterceptor {
+public class MyAfterThrowingAdviceInterceptor extends AbstractMyAspectAdvice implements MyMethodInterceptor {
 
-
-    private String throwingName;
 
     public MyAfterThrowingAdviceInterceptor(Method aspectMethod, Object aspectTarget) {
         super(aspectMethod, aspectTarget);
@@ -27,9 +25,5 @@ public class MyAfterThrowingAdviceInterceptor extends MyAbstractAspectAdvice imp
             invokeAdviceMethod(mi,null,e.getCause());
             throw e;
         }
-    }
-
-    public void setThrowName(String throwName){
-        this.throwingName = throwName;
     }
 }

@@ -12,33 +12,33 @@ import java.util.List;
  * @Date: 2019/4/17 16:55
  * @Description:
  */
-public class MyJdkDynamicAopProxy implements  MyAopProxy,InvocationHandler{
+public class MyJdkDynamicAopProxy implements MyAopProxy, InvocationHandler{
 
-    private MyAdvisedSupport advised;
+    private MyAdvisedSupport advisedSupport;
 
-    public MyJdkDynamicAopProxy(MyAdvisedSupport config){
-        this.advised = config;
+    public MyJdkDynamicAopProxy(MyAdvisedSupport advisedSupport){
+        this.advisedSupport = advisedSupport;
     }
 
     @Override
     public Object getProxy() {
-        return getProxy(this.advised.getTargetClass().getClassLoader());
+        return getProxy(this.advisedSupport.getTargetClass().getClassLoader());
     }
 
     @Override
     public Object getProxy(ClassLoader classLoader) {
-        return Proxy.newProxyInstance(classLoader,this.advised.getTargetClass().getInterfaces(),this);
+        return Proxy.newProxyInstance(classLoader,this.advisedSupport.getTargetClass().getInterfaces(),this);
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        List<Object> interceptorsAndDynamicMethodMatchers = this.advised
-                .getInterceptorsAndDynamicInterceptionAdvice(method,this.advised.getTargetClass());
+        List<Object> interceptorsAndDynamicMethodMatchers = this.advisedSupport
+                .getInterceptorsAndDynamicInterceptionAdvice(method,this.advisedSupport.getTargetClass());
 
         MyMethodInvocation invocation = new MyMethodInvocation(
-                proxy, this.advised.getTarget(),
-                method, args, this.advised.getTargetClass(),
+                proxy, this.advisedSupport.getTarget(),
+                method, args, this.advisedSupport.getTargetClass(),
                 interceptorsAndDynamicMethodMatchers);
 
         return invocation.proceed();
